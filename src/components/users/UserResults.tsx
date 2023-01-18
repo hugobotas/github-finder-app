@@ -3,7 +3,7 @@ import Spinner from '../layout/Spinner';
 import UserItem from './UserItem';
 import GithubContext from '../../context/github/GithubContext';
 
-function UserResults() {
+const UserResults = () => {
   const { users, fetchUsers, loading } = useContext(GithubContext);
 
   useEffect(() => {
@@ -22,6 +22,6 @@ function UserResults() {
   } else {
     return <Spinner />;
   }
-}
+};
 
 export default UserResults;

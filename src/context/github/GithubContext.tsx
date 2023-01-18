@@ -14,7 +14,7 @@ const GithubContext = createContext<GithubContextType>({} as GithubContextType);
 const GITHUB_URL = import.meta.env.VITE_APP_GITHUB_URL;
 const GITHUB_TOKEN = import.meta.env.VITE_APP_GITHUB_TOKEN;
 
-export function GithubProvider({ children }: GithubProviderType) {
+export const GithubProvider = ({ children }: GithubProviderType) => {
   const [users, setUsers] = useState([] as { id: number; login: string; avatar_url: string }[]);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +40,6 @@ export function GithubProvider({ children }: GithubProviderType) {
       {children}
     </GithubContext.Provider>
   );
-}
+};
 
 export default GithubContext;

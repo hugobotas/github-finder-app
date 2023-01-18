@@ -1,9 +1,18 @@
+interface GithubResponseType {
+  id: number;
+  login: string;
+  avatar_url: string;
+}
 const githubReducer = (
-  state: { users: { id: number; login: string; avatar_url: string }[]; loading: boolean },
-  action: { type: string; payload: { id: number; login: string; avatar_url: string }[] },
+  state: { users: GithubResponseType[]; loading: boolean },
+  action: {
+    type: string;
+    payload?: GithubResponseType[];
+  },
 ) => {
   switch (action.type) {
     case 'GET_USERS':
+      if (!action.payload) return state;
       return {
         ...state,
         users: action.payload,

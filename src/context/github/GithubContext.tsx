@@ -43,7 +43,6 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
   const setLoading = () => {
     dispatch({
       type: 'SET_LOADING',
-      payload: [],
     });
   };
   return (

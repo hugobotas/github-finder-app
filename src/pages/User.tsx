@@ -5,12 +5,13 @@ import Spinner from '../components/layout/Spinner';
 import { FaCodepen, FaStore, FaUserFriends, FaUsers } from 'react-icons/all';
 
 const User = () => {
-  const { getUser, user, loading } = useContext(GithubContext);
+  const { getUser, user, loading, getUserRepos } = useContext(GithubContext);
   const params = useParams();
 
   useEffect(() => {
     if (params.login) {
       getUser(params.login).then();
+      getUserRepos(params.login).then();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -8,6 +8,7 @@ interface GithubProviderType {
 
 interface GithubContextType {
   users: GithubResponseType[];
+  repos: GithubReposResponseType[];
   loading: boolean;
   searchUsers: (text: string) => Promise<void>;
   clearUsers: () => void;
@@ -17,6 +18,7 @@ interface GithubContextType {
   }>;
   user: GithubResponseType;
   getUser: (text: string) => Promise<void>;
+  getUserRepos: (login: string) => Promise<void>;
 }
 
 const GithubContext = createContext<GithubContextType>({} as GithubContextType);
@@ -76,6 +78,22 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
     }
   };
 
+  const getUserRepos = async (login: string) => {
+    setLoading();
+
+    const response = await fetch(`${GITHUB_URL}/users/${login}/repos`, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+      },
+    });
+
+    const data = await response.json();
+    dispatch({
+      type: 'GET_REPOS',
+      payload: data,
+    });
+  };
+
   const clearUsers = () => {
     dispatch({
       type: 'CLEAR_USERS',
@@ -96,7 +114,9 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
         clearUsers,
         dispatch,
         user: state.user,
+        repos: state.repos,
         getUser,
+        getUserRepos,
       }}
     >
       {children}

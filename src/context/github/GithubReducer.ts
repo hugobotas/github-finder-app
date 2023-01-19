@@ -2,10 +2,10 @@ export interface GithubReposResponseType {
   name: string;
   description: string;
   html_url: string;
-  forks: string;
-  open_issues: string;
-  watchers_count: string;
-  stargazers_count: string;
+  forks: number;
+  open_issues: number;
+  watchers_count: number;
+  stargazers_count: number;
 }
 
 export interface GithubResponseType {
@@ -19,17 +19,22 @@ export interface GithubResponseType {
   twitter_username: string;
   login: string;
   html_url: string;
-  followers: string;
-  following: string;
-  public_repos: string;
-  public_gists: string;
-  hireable: string;
+  followers: number;
+  following: number;
+  public_repos: number;
+  public_gists: number;
+  hireable: boolean;
 }
 const githubReducer = (
-  state: { user: GithubResponseType; users: GithubResponseType[]; loading: boolean },
+  state: {
+    repos: GithubReposResponseType[];
+    user: GithubResponseType;
+    users: GithubResponseType[];
+    loading: boolean;
+  },
   action: {
     type: string;
-    payload?: GithubResponseType[] | GithubResponseType;
+    payload?: GithubResponseType[] | GithubResponseType | GithubReposResponseType[];
   },
 ) => {
   switch (action.type) {
@@ -55,6 +60,13 @@ const githubReducer = (
       return {
         ...state,
         user: action.payload as GithubResponseType,
+        loading: false,
+      };
+    case 'GET_REPOS':
+      if (!action.payload) return state;
+      return {
+        ...state,
+        repos: action.payload as GithubReposResponseType[],
         loading: false,
       };
     default:

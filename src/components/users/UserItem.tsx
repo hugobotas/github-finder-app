@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+import { GithubResponseType } from '../../context/github/GithubReducer';
 
 interface UserItemProps {
-  user: { id: number; login: string; avatar_url: string };
+  user: GithubResponseType;
 }
 
 const UserItem = ({ user: { login, avatar_url } }: UserItemProps) => (

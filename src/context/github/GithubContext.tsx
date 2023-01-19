@@ -1,15 +1,22 @@
 import { createContext, Dispatch, ReactNode, useReducer } from 'react';
-import githubReducer, { GithubResponseType } from './GithubReducer';
+import githubReducer, { GithubReposResponseType, GithubResponseType } from './GithubReducer';
+import { redirect } from 'react-router-dom';
 
 interface GithubProviderType {
   children: ReactNode;
 }
+
 interface GithubContextType {
-  users: { id: number; login: string; avatar_url: string }[];
+  users: GithubResponseType[];
   loading: boolean;
   searchUsers: (text: string) => Promise<void>;
   clearUsers: () => void;
-  dispatch: Dispatch<{ type: string; payload?: GithubResponseType[] | undefined }>;
+  dispatch: Dispatch<{
+    type: string;
+    payload?: GithubResponseType[] | GithubResponseType | undefined;
+  }>;
+  user: GithubResponseType;
+  getUser: (text: string) => Promise<void>;
 }
 
 const GithubContext = createContext<GithubContextType>({} as GithubContextType);
@@ -19,11 +26,15 @@ const GITHUB_TOKEN = import.meta.env.VITE_APP_GITHUB_TOKEN;
 
 export const GithubProvider = ({ children }: GithubProviderType) => {
   const initialState: {
-    users: { id: number; login: string; avatar_url: string }[];
+    user: GithubResponseType;
+    users: GithubResponseType[];
     loading: boolean;
+    repos: GithubReposResponseType[];
   } = {
-    users: [],
+    user: {} as GithubResponseType,
+    users: [] as GithubResponseType[],
     loading: false,
+    repos: [] as GithubReposResponseType[],
   };
 
   const [state, dispatch] = useReducer(githubReducer, initialState);
@@ -45,6 +56,26 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
     });
   };
 
+  const getUser = async (login: string) => {
+    setLoading();
+
+    const response = await fetch(`${GITHUB_URL}/users/${login}`, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+      },
+    });
+
+    if (response.status === 404) {
+      redirect('/notfound');
+    } else {
+      const data: GithubResponseType = await response.json();
+      dispatch({
+        type: 'GET_USER',
+        payload: data,
+      });
+    }
+  };
+
   const clearUsers = () => {
     dispatch({
       type: 'CLEAR_USERS',
@@ -64,6 +95,8 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
         searchUsers,
         clearUsers,
         dispatch,
+        user: state.user,
+        getUser,
       }}
     >
       {children}

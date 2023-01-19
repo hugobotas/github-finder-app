@@ -1,4 +1,4 @@
-interface GithubResponseType {
+export interface GithubResponseType {
   id: number;
   login: string;
   avatar_url: string;
@@ -22,6 +22,11 @@ const githubReducer = (
       return {
         ...state,
         loading: true,
+      };
+    case 'CLEAR_USERS':
+      return {
+        ...state,
+        users: [],
       };
     default:
       return state;

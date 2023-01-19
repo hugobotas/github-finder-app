@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useReducer } from 'react';
-import githubReducer from './GithubReducer';
+import { createContext, Dispatch, ReactNode, useReducer } from 'react';
+import githubReducer, { GithubResponseType } from './GithubReducer';
 
 interface GithubProviderType {
   children: ReactNode;
@@ -7,7 +7,9 @@ interface GithubProviderType {
 interface GithubContextType {
   users: { id: number; login: string; avatar_url: string }[];
   loading: boolean;
-  fetchUsers: () => Promise<void>;
+  searchUsers: (text: string) => Promise<void>;
+  clearUsers: () => void;
+  dispatch: Dispatch<{ type: string; payload?: GithubResponseType[] | undefined }>;
 }
 
 const GithubContext = createContext<GithubContextType>({} as GithubContextType);
@@ -26,17 +28,26 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
 
   const [state, dispatch] = useReducer(githubReducer, initialState);
 
-  const fetchUsers = async () => {
+  const searchUsers = async (text: string) => {
     setLoading();
-    const response = await fetch(`${GITHUB_URL}/users`, {
+    const params = new URLSearchParams({
+      q: text,
+    });
+    const response = await fetch(`${GITHUB_URL}/search/users?${params}`, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
       },
     });
-    const data = await response.json();
+    const { items } = await response.json();
     dispatch({
       type: 'GET_USERS',
-      payload: data,
+      payload: items,
+    });
+  };
+
+  const clearUsers = () => {
+    dispatch({
+      type: 'CLEAR_USERS',
     });
   };
 
@@ -50,7 +61,9 @@ export const GithubProvider = ({ children }: GithubProviderType) => {
       value={{
         users: state.users,
         loading: state.loading,
-        fetchUsers,
+        searchUsers,
+        clearUsers,
+        dispatch,
       }}
     >
       {children}

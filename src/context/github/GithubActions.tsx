@@ -19,32 +19,14 @@ export const searchUsers = async (text: string) => {
   if ('items' in response.data) return response.data.items;
 };
 
-export const getUser = async (login: string) => {
-  const response = await fetch(`${GITHUB_URL}/users/${login}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
-
-  if (response.status === 404) {
-    redirect('/notfound');
-  } else {
-    const data: GithubResponseType = await response.json();
-    return data;
-  }
-};
-export const getUserRepos = async (login: string) => {
+export const getUserAndRepos = async (login: string) => {
   const params = new URLSearchParams({
     sort: 'created',
     per_page: '20',
   });
-
-  const response = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
-
-  const data: GithubReposResponseType[] = await response.json();
-  return data;
+  const [user, repos] = await Promise.all([
+    github.get<GithubResponseType>(`${GITHUB_URL}/users/${login}`),
+    github.get<GithubReposResponseType[]>(`${GITHUB_URL}/users/${login}/repos?${params}`),
+  ]);
+  return { user: user.data, repos: repos.data };
 };

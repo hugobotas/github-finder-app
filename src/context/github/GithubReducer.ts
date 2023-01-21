@@ -35,7 +35,7 @@ const githubReducer = (
   },
   action: {
     type: string;
-    payload?: GithubResponseType[] | GithubResponseType | GithubReposResponseType[];
+    payload?: GithubResponseType[] | { user: GithubResponseType; repos: GithubReposResponseType[] };
   },
 ) => {
   switch (action.type) {
@@ -56,20 +56,16 @@ const githubReducer = (
         ...state,
         users: [] as GithubResponseType[],
       };
-    case 'GET_USER':
+    case 'GET_USER_AND_REPOS':
       if (!action.payload) return state;
-      return {
-        ...state,
-        user: action.payload as GithubResponseType,
-        loading: false,
-      };
-    case 'GET_REPOS':
-      if (!action.payload) return state;
-      return {
-        ...state,
-        repos: action.payload as GithubReposResponseType[],
-        loading: false,
-      };
+      if ('user' in action.payload)
+        return {
+          ...state,
+          user: action.payload.user as GithubResponseType,
+          repos: action.payload.repos as GithubReposResponseType[],
+          loading: false,
+        };
+      return state;
     default:
       return state;
   }

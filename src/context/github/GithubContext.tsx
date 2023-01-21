@@ -12,7 +12,10 @@ interface GithubContextType {
   repos: GithubReposResponseType[];
   dispatch: Dispatch<{
     type: string;
-    payload?: GithubResponseType[] | GithubResponseType | GithubReposResponseType[] | undefined;
+    payload?:
+      | GithubResponseType[]
+      | { user: GithubResponseType; repos: GithubReposResponseType[] }
+      | undefined;
   }>;
 }
 

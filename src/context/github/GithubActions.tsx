@@ -1,20 +1,22 @@
 import { redirect } from 'react-router-dom';
 import { GithubReposResponseType, GithubResponseType } from './GithubReducer';
+import axios from 'axios';
 
 const GITHUB_URL = import.meta.env.VITE_APP_GITHUB_URL;
 const GITHUB_TOKEN = import.meta.env.VITE_APP_GITHUB_TOKEN;
+
+const github = axios.create({
+  baseURL: GITHUB_URL,
+  headers: { Authorization: `token ${GITHUB_TOKEN}` },
+});
 
 export const searchUsers = async (text: string) => {
   const params = new URLSearchParams({
     q: text,
   });
-  const response = await fetch(`${GITHUB_URL}/search/users?${params}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
-  const { items } = await response.json();
-  return items;
+
+  const response = await github.get<GithubResponseType[]>(`${GITHUB_URL}/search/users?${params}`);
+  if ('items' in response.data) return response.data.items;
 };
 
 export const getUser = async (login: string) => {

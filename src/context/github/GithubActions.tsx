@@ -1,4 +1,3 @@
-import { redirect } from 'react-router-dom';
 import { GithubReposResponseType, GithubResponseType } from './GithubReducer';
 import axios from 'axios';
 
@@ -20,13 +19,14 @@ export const searchUsers = async (text: string) => {
 };
 
 export const getUserAndRepos = async (login: string) => {
-  const params = new URLSearchParams({
-    sort: 'created',
-    per_page: '20',
-  });
   const [user, repos] = await Promise.all([
     github.get<GithubResponseType>(`${GITHUB_URL}/users/${login}`),
-    github.get<GithubReposResponseType[]>(`${GITHUB_URL}/users/${login}/repos?${params}`),
+    github.get<GithubReposResponseType[]>(`${GITHUB_URL}/users/${login}/repos`, {
+      params: {
+        sort: 'created',
+        per_page: '20',
+      },
+    }),
   ]);
   return { user: user.data, repos: repos.data };
 };

@@ -61,8 +61,8 @@ const githubReducer = (
       if ('user' in action.payload)
         return {
           ...state,
-          user: action.payload.user as GithubResponseType,
-          repos: action.payload.repos as GithubReposResponseType[],
+          user: action.payload.user,
+          repos: action.payload.repos,
           loading: false,
         };
       return state;

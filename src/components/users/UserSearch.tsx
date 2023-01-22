@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useContext, useState } from 'react';
 import GithubContext from '../../context/github/GithubContext';
 import AlertContext from '../../context/alert/AlertContext';
 import { searchUsers } from '../../context/github/GithubActions';
+import { GithubReposResponseType, GithubResponseType } from '../../context/github/GithubReducer';
 
 const UserSearch = () => {
   const { users, dispatch } = useContext(GithubContext);
@@ -18,7 +19,10 @@ const UserSearch = () => {
       setAlert('Please enter something', 'error');
     } else {
       dispatch({ type: 'SET_LOADING' });
-      const users = await searchUsers(text);
+      const users = (await searchUsers(text)) as {
+        user: GithubResponseType;
+        repos: GithubReposResponseType[];
+      };
       dispatch({ type: 'GET_USERS', payload: users });
       setText('');
     }
